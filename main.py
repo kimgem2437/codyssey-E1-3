@@ -1,3 +1,5 @@
+EPSILON = 1e-9
+
 def calculate_mac(pattern, filter_data):
     score = 0.0
 
@@ -6,6 +8,17 @@ def calculate_mac(pattern, filter_data):
             score += pattern[row][col] * filter_data[row][col]
 
     return score
+
+def compare_scores(score_a, score_b, lable_a, lable_b):
+    difference = abs(score_a - score_b)
+
+    if difference < EPSILON:
+        return "UNDECIDED"
+
+    if score_a > score_b:
+        return lable_a
+
+    return lable_b
 
 def main():
     cross_pattern = [
@@ -28,9 +41,16 @@ def main():
 
     cross_score = calculate_mac(cross_pattern, cross_filter)
     x_score = calculate_mac(cross_pattern, x_filter)
+    result = compare_scores(
+        cross_score,
+        x_score,
+        "Cross",
+        "X"
+    )
 
     print(f"십자가 필터 점수: {cross_score}")
     print(f"X 필터 점수: {x_score}")
+    print(f"판정 결과: {result}")
 
 if __name__ == "__main__":
     main()
