@@ -20,27 +20,42 @@ def compare_scores(score_a, score_b, lable_a, lable_b):
 
     return lable_b
 
+def input_matrix(name, size=3):
+    matrix = []
+
+    print(f"\n{name} ({size}줄 입력, 공백 구분)")
+
+    for row_number in range(1, size + 1):
+        while True:
+            try:
+                user_input = input(f"{row_number}번째 행: ").strip()
+                values = user_input.split()
+
+                if len(values) != size:
+                    print(
+                        f"입력 형식 오류: 각 줄에 {size}개의 숫자를 "
+                        "공백으로 구분해 입력하세요."
+                    )
+                    continue
+
+                row = [float(values) for values in values]
+                matrix.append(row)
+                break
+
+            except ValueError:
+                print("입력 형식 오류: 숫자만 입력하세요.")
+
+    return matrix
+
 def main():
-    cross_pattern = [
-        [0, 1, 0],
-        [1, 1, 1],
-        [0, 1, 0]
-    ]
+    print("=== Mini NPU Simulator ===")
 
-    cross_filter = [
-        [0, 1, 0],
-        [1, 1, 1],
-        [0, 1, 0]
-    ]
+    cross_filter = input_matrix("Cross 필터")
+    x_filter = input_matrix("X 필터")
+    pattern = input_matrix("판별할 패턴")
 
-    x_filter = [
-        [1, 0, 1],
-        [0, 1, 0],
-        [1, 0, 1]
-    ]
-
-    cross_score = calculate_mac(cross_pattern, cross_filter)
-    x_score = calculate_mac(cross_pattern, x_filter)
+    cross_score = calculate_mac(pattern, cross_filter)
+    x_score = calculate_mac(pattern, x_filter)
     result = compare_scores(
         cross_score,
         x_score,
@@ -48,7 +63,7 @@ def main():
         "X"
     )
 
-    print(f"십자가 필터 점수: {cross_score}")
+    print(f"Cross 필터 점수: {cross_score}")
     print(f"X 필터 점수: {x_score}")
     print(f"판정 결과: {result}")
 
