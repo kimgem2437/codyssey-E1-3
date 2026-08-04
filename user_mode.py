@@ -1,5 +1,6 @@
 from input_utils import input_matrix
 from mac import calculate_mac, compare_scores
+from performance import measure_average_mac_time, calculate_operation_count
 
 def run_user_input_mode():
 
@@ -9,6 +10,10 @@ def run_user_input_mode():
 
     score_a = calculate_mac(pattern, filter_a)
     score_b = calculate_mac(pattern, filter_b)
+
+    average_time_a = measure_average_mac_time(pattern, filter_a)
+    average_time_b = measure_average_mac_time(pattern, filter_b)
+    operation_count = calculate_operation_count(3)
 
     result = compare_scores(
         score_a,
@@ -21,3 +26,13 @@ def run_user_input_mode():
     print(f"A 점수: {score_a}")
     print(f"B 점수: {score_b}")
     print(f"판정 결과: {result}")
+
+    print("\n=== 3x3 MAC 성능 측정 ===")
+    print(
+        f"A 필터 평균 실행시간: {average_time_a:.6f}ms, "
+        f"연산 횟수: {operation_count}"
+    )
+    print(
+        f"B 필터 평균 실행시간: {average_time_b:.6f}ms, "
+        f"연산 횟수: {operation_count}"
+    )

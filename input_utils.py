@@ -16,7 +16,7 @@ def input_matrix(name, size=3):
                     )
                     continue
 
-                row = [float(values) for value in values]
+                row = [float(value) for value in values]
                 matrix.append(row)
                 break
 

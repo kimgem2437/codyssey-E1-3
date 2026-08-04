@@ -1,5 +1,6 @@
 import json
 from mac import calculate_mac, compare_scores
+from performance import measure_average_mac_time, calculate_operation_count
 
 def load_json_data(file_path="data.json"):
     try:
@@ -93,6 +94,7 @@ def run_json_analysis_mode():
     total_count = 0
     pass_count = 0
     failure_cases = []
+    performance_results = {}
 
     for pattern_name, pattern_data in patterns.items():
         total_count += 1
@@ -136,6 +138,14 @@ def run_json_analysis_mode():
 
             cross_score = calculate_mac(pattern, cross_filter)
             x_score = calculate_mac(pattern, x_filter)
+
+            if size not in performance_results:
+                average_time = measure_average_mac_time(
+                    pattern,
+                    cross_filter
+                )
+
+                performance_results[size] = average_time
 
             prediction = compare_scores(
                 cross_score,
@@ -191,3 +201,15 @@ def run_json_analysis_mode():
     print(f"PASS: {pass_count}개")
     print(f"FAIL: {fail_count}개")
     print(f"실패 패턴: {', '.join(failure_cases)}")
+
+    print("\n=== 크기별 MAC 성능 측정 ===")
+
+    for size in sorted(performance_results):
+        average_time = performance_results[size]
+        operation_count = calculate_operation_count(size)
+
+        print(
+            f"{size}x{size}: "
+            f"평균 실행시간={average_time:.6f}ms, "
+            f"연산 횟수={operation_count}"
+        )
