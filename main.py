@@ -1,5 +1,6 @@
 from input_utils import get_mode_choice
 from user_mode import run_user_input_mode
+from json_analyzer import run_json_analysis_mode
 
 def main():
     print("=== Mini NPU Simulator ===")
@@ -9,7 +10,7 @@ def main():
     if mode == "1":
         run_user_input_mode()
     else:
-        print("data.json 분석 모드는 다음 단계에서 구현합니다.")
+        run_json_analysis_mode()
     
 
 if __name__ == "__main__":
