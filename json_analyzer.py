@@ -46,6 +46,35 @@ def get_pattern_size(pattern_name):
 
     return int(parts[1])
 
+def validate_matrix(matrix, size, matrix_name):
+    if not isinstance(matrix, list):
+        raise ValueError(f"{matrix_name}: 행렬은 리스트여야 합니다.")
+
+    if len(matrix) != size:
+        raise ValueError(
+            f"{matrix_name}: 행의 개수는 {size}개여야 합니다."
+        )
+
+    for row_index, row in enumerate(matrix, start=1):
+        if not isinstance(row, list):
+            raise ValueError(
+                f"{matrix_name}: {row_index}번째 행은 리스트여야 합니다."
+            )
+
+        if len(row) != size:
+            raise ValueError(
+                f"{matrix_name}: {row_index}번째 행의 값은 "
+                f"{size}개여야 합니다."
+            )
+
+        for col_index, value in enumerate(row, start=1):
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise ValueError(
+                    f"{matrix_name}: "
+                    f"{row_index}행 {col_index}열은 숫자여야 합니다."
+                )
+
+
 def run_json_analysis_mode():
     data = load_json_data()
 
@@ -79,6 +108,10 @@ def run_json_analysis_mode():
         pattern = pattern_data.get("input")
         cross_filter = selected_filters.get("cross")
         x_filter = selected_filters.get("x")
+
+        validate_matrix(pattern, size, f"{pattern_name} 패턴")
+        validate_matrix(cross_filter, size, f"{filter_key} Cross 필터")
+        validate_matrix(x_filter, size, f"{filter_key} X 필터")
 
         cross_score = calculate_mac(pattern, cross_filter)
         x_score = calculate_mac(pattern, x_filter)
