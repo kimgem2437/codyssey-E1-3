@@ -95,51 +95,94 @@ def run_json_analysis_mode():
     failure_cases = []
 
     for pattern_name, pattern_data in patterns.items():
-        size = get_pattern_size(pattern_name)
-        filter_key = f"size_{size}"
-        expected = normalize_label(pattern_data.get("expected"))
-
-        selected_filters = filters.get(filter_key)
-
-        if selected_filters is None:
-            print(f"{pattern_name}: 해당 크기의 필터가 없습니다.")
-            continue
-
-        pattern = pattern_data.get("input")
-        cross_filter = selected_filters.get("cross")
-        x_filter = selected_filters.get("x")
-
-        validate_matrix(pattern, size, f"{pattern_name} 패턴")
-        validate_matrix(cross_filter, size, f"{filter_key} Cross 필터")
-        validate_matrix(x_filter, size, f"{filter_key} X 필터")
-
-        cross_score = calculate_mac(pattern, cross_filter)
-        x_score = calculate_mac(pattern, x_filter)
-
-        prediction = compare_scores(
-            cross_score,
-            x_score,
-            "Cross",
-            "X"
-        )
-
-        result = "PASS" if prediction == expected else "FAIL"
-
         total_count += 1
 
-        if result == "PASS":
-            pass_count += 1
-        else:
-            failure_cases.append(pattern_name)
+        try:
+            if not isinstance(pattern_data, dict):
+                raise ValueError("패턴 데이터는 객체여야 합니다.")
 
-        print(
-            f"{pattern_name}: "
-            f"Cross={cross_score:.4f}, "
-            f"X={x_score:.4f}, "
-            f"예측={prediction}, "
-            f"정답={expected}, "
-            f"결과={result}"
-        )
+            size = get_pattern_size(pattern_name)
+            filter_key = f"size_{size}"
+            expected = normalize_label(pattern_data.get("expected"))
+
+            selected_filters = filters.get(filter_key)
+
+            if not isinstance(selected_filters, dict):
+                raise ValueError(
+                    f"{filter_key} 필터가 없거나 형식이 잘못되었습니다."
+                )
+
+            pattern = pattern_data.get("input")
+            cross_filter = selected_filters.get("cross")
+            x_filter = selected_filters.get("x")
+
+            validate_matrix(
+                pattern,
+                size,
+                f"{pattern_name} 패턴"
+            )
+
+            validate_matrix(
+                cross_filter,
+                size,
+                f"{filter_key} Cross 필터"
+            )
+
+            validate_matrix(
+                x_filter,
+                size,
+                f"{filter_key} X 필터"
+            )
+
+            cross_score = calculate_mac(pattern, cross_filter)
+            x_score = calculate_mac(pattern, x_filter)
+
+            prediction = compare_scores(
+                cross_score,
+                x_score,
+                "Cross",
+                "X"
+            )
+
+            result = (
+                "PASS"
+                if prediction == expected
+                else "FAIL"
+            )
+
+            if result == "PASS":
+                pass_count += 1
+            else:
+                failure_cases.append(
+                    f"{pattern_name} "
+                    f"(예측={prediction}, 정답={expected})"
+                )
+
+            print(
+                f"{pattern_name}: "
+                f"Cross={cross_score:.4f}, "
+                f"X={x_score:.4f}, "
+                f"예측={prediction}, "
+                f"정답={expected}, "
+                f"결과={result}"
+            )
+
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            IndexError,
+            AttributeError
+        ) as error:
+            failure_cases.append(
+                f"{pattern_name} ({error})"
+            )
+
+            print(
+                f"{pattern_name}: "
+                f"결과=FAIL, "
+                f"오류={error}"
+            )
 
     fail_count = total_count - pass_count
 
